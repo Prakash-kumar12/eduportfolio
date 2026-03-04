@@ -661,10 +661,6 @@ html, body {
         <div class="form-title">Sign in</div>
         <div class="form-sub">Enter your credentials to access your portfolio.</div>
 
-        <div class="alert info show" id="login-demo-note">
-          <span>🔌</span> <span>Demo UI — connect to the backend to enable real auth.</span>
-        </div>
-
         <div class="alert error" id="login-alert"></div>
 
         <div class="field">
@@ -787,7 +783,7 @@ html, body {
 
         <div class="verify-email-display">
           <span>✉</span>
-          <span id="verify-email-shown">you@school.edu</span>
+          <span id="verify-email-shown"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="2a53455f6a594942454546044f4e5f">[email&#160;protected]</a></span>
         </div>
 
         <div class="alert error" id="verify-alert"></div>
@@ -857,7 +853,7 @@ html, body {
   </div><!-- end right-panel -->
 </div>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 // ── SCREEN ROUTER ──
 function show(name) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -897,15 +893,22 @@ function checkStrength(val) {
 function toggleCheck(el) { el.classList.toggle('checked'); }
 
 // ── VALIDATE EMAIL ──
+// ── BACKEND URL ──
+const API = 'https://eduportfolio-production.up.railway.app/api';
+
+// store current signup email for verify screen
+let currentEmail = '';
+
 function validEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
 
 // ── LOGIN HANDLER ──
-function handleLogin() {
+async function handleLogin() {
   const email = document.getElementById('login-email').value.trim();
   const pwd   = document.getElementById('login-pwd').value;
   let ok = true;
 
   clearErrors(['login-email', 'login-pwd'], ['login-email-err', 'login-pwd-err']);
+  document.getElementById('login-alert').className = 'alert error';
 
   if (!validEmail(email)) { showError('login-email', 'login-email-err'); ok = false; }
   if (!pwd) { showError('login-pwd', 'login-pwd-err'); ok = false; }
@@ -915,18 +918,46 @@ function handleLogin() {
   btn.textContent = 'Signing in…';
   btn.classList.add('loading');
 
-  // Simulate API call
-  setTimeout(() => {
+  try {
+    const res  = await fetch(`${API}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password: pwd }),
+    });
+    const data = await res.json();
+
+    if (!res.ok) {
+      // If unverified, send to verify screen
+      if (data.requiresVerification) {
+        currentEmail = email;
+        document.getElementById('verify-email-shown').textContent = email;
+        show('verify');
+        startResendTimer();
+        return;
+      }
+      throw new Error(data.error || 'Login failed.');
+    }
+
+    // Save tokens
+    localStorage.setItem('accessToken',  data.accessToken);
+    localStorage.setItem('refreshToken', data.refreshToken);
+    localStorage.setItem('user', JSON.stringify(data.user));
+
+    // Redirect to portfolio dashboard
+    window.location.href = 'portfolio.html';
+
+  } catch (err) {
+    const a = document.getElementById('login-alert');
+    a.textContent = '⚠ ' + err.message;
+    a.className = 'alert error show';
+  } finally {
     btn.textContent = 'Sign In →';
     btn.classList.remove('loading');
-    const alert = document.getElementById('login-alert');
-    alert.textContent = '⚠ Backend not connected. See backend code to set up real auth.';
-    alert.className = 'alert error show';
-  }, 1400);
+  }
 }
 
 // ── SIGNUP HANDLER ──
-function handleSignup() {
+async function handleSignup() {
   const name  = document.getElementById('signup-name').value.trim();
   const email = document.getElementById('signup-email').value.trim();
   const pwd   = document.getElementById('signup-pwd').value;
@@ -936,32 +967,47 @@ function handleSignup() {
 
   clearErrors(['signup-name','signup-email','signup-pwd','signup-pwd2'],
               ['signup-name-err','signup-email-err','signup-pwd-err','signup-pwd2-err']);
+  document.getElementById('signup-alert').className = 'alert error';
 
   if (!name) { showError('signup-name', 'signup-name-err'); ok = false; }
   if (!validEmail(email)) { showError('signup-email', 'signup-email-err'); ok = false; }
   if (pwd.length < 8) { showError('signup-pwd', 'signup-pwd-err'); ok = false; }
   if (pwd !== pwd2) { showError('signup-pwd2', 'signup-pwd2-err'); ok = false; }
-
   if (!terms) {
     const a = document.getElementById('signup-alert');
     a.textContent = '⚠ Please accept the Terms of Service.';
     a.className = 'alert error show';
     return;
   }
-
   if (!ok) return;
 
   const btn = document.getElementById('signup-btn');
   btn.textContent = 'Creating account…';
   btn.classList.add('loading');
 
-  setTimeout(() => {
-    btn.textContent = 'Create Account →';
-    btn.classList.remove('loading');
+  try {
+    const res  = await fetch(`${API}/auth/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email, password: pwd }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Registration failed.');
+
+    // Move to verify screen
+    currentEmail = email;
     document.getElementById('verify-email-shown').textContent = email;
     show('verify');
     startResendTimer();
-  }, 1200);
+
+  } catch (err) {
+    const a = document.getElementById('signup-alert');
+    a.textContent = '⚠ ' + err.message;
+    a.className = 'alert error show';
+  } finally {
+    btn.textContent = 'Create Account →';
+    btn.classList.remove('loading');
+  }
 }
 
 // ── OTP INPUTS ──
@@ -982,13 +1028,14 @@ function getOtp() {
 }
 
 // ── VERIFY HANDLER ──
-function handleVerify() {
+async function handleVerify() {
   const code = getOtp();
-  const alert = document.getElementById('verify-alert');
+  const alertEl = document.getElementById('verify-alert');
+  alertEl.className = 'alert error';
 
   if (code.length < 6) {
-    alert.textContent = '⚠ Please enter all 6 digits.';
-    alert.className = 'alert error show';
+    alertEl.textContent = '⚠ Please enter all 6 digits.';
+    alertEl.className = 'alert error show';
     return;
   }
 
@@ -996,19 +1043,35 @@ function handleVerify() {
   btn.textContent = 'Verifying…';
   btn.classList.add('loading');
 
-  setTimeout(() => {
+  try {
+    const res  = await fetch(`${API}/auth/verify-email`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: currentEmail, code }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Verification failed.');
+
+    // Save tokens
+    localStorage.setItem('accessToken',  data.accessToken);
+    localStorage.setItem('refreshToken', data.refreshToken);
+    localStorage.setItem('user', JSON.stringify(data.user));
+
+    show('success');
+
+  } catch (err) {
+    alertEl.textContent = '⚠ ' + err.message;
+    alertEl.className = 'alert error show';
+  } finally {
     btn.textContent = 'Verify Email →';
     btn.classList.remove('loading');
-    // In real app: validate against backend
-    // For demo, any 6-digit code transitions to success
-    show('success');
-  }, 1200);
+  }
 }
 
 // ── RESEND TIMER ──
 let timerInterval;
 function startResendTimer() {
-  const btn = document.getElementById('resend-btn');
+  const btn   = document.getElementById('resend-btn');
   const timer = document.getElementById('resend-timer');
   let secs = 60;
   btn.disabled = true;
@@ -1021,28 +1084,49 @@ function startResendTimer() {
   }, 1000);
 }
 
-function handleResend() {
+async function handleResend() {
   startResendTimer();
-  // In real app: POST /api/auth/resend-verification
+  try {
+    await fetch(`${API}/auth/resend-verification`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: currentEmail }),
+    });
+  } catch (e) { console.error(e); }
 }
 
 // ── FORGOT HANDLER ──
-function handleForgot() {
+async function handleForgot() {
   const email = document.getElementById('forgot-email').value.trim();
   clearErrors(['forgot-email'], ['forgot-email-err']);
+  document.getElementById('forgot-success').className = 'alert success';
+  document.getElementById('forgot-error').className   = 'alert error';
+
   if (!validEmail(email)) { showError('forgot-email', 'forgot-email-err'); return; }
 
   const btn = document.getElementById('forgot-btn');
   btn.textContent = 'Sending…';
   btn.classList.add('loading');
 
-  setTimeout(() => {
+  try {
+    const res  = await fetch(`${API}/auth/forgot-password`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Request failed.');
+
+    document.getElementById('forgot-success').textContent = `✓ ${data.message}`;
+    document.getElementById('forgot-success').className = 'alert success show';
+
+  } catch (err) {
+    document.getElementById('forgot-error').textContent = '⚠ ' + err.message;
+    document.getElementById('forgot-error').className   = 'alert error show';
+  } finally {
     btn.textContent = 'Send Reset Link →';
     btn.classList.remove('loading');
-    document.getElementById('forgot-success').textContent = `✓ Reset link sent to ${email}`;
-    document.getElementById('forgot-success').className = 'alert success show';
-    document.getElementById('forgot-error').className = 'alert error';
-  }, 1200);
+  }
 }
 
 // ── HELPERS ──
@@ -1052,10 +1136,4 @@ function showError(inputId, errId) {
 }
 
 function clearErrors(inputs, errs) {
-  inputs.forEach(id => document.getElementById(id)?.classList.remove('error'));
-  errs.forEach(id => document.getElementById(id)?.classList.remove('show'));
-  document.getElementById('signup-alert') && (document.getElementById('signup-alert').className = 'alert error');
-}
-</script>
-</body>
-</html>
+  inputs.forEach(id => document.getElementById(id)?.classList.remove('erro
