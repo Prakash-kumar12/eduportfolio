@@ -1,0 +1,1061 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EduPortfolio — Auth</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Syne:wght@400;500;700&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --void: #0d0f14;
+  --deep: #13161e;
+  --panel: #1a1d27;
+  --rim: #252836;
+  --muted: #3a3f52;
+  --fog: #6b7291;
+  --cloud: #9ba3c0;
+  --light: #e8eaf2;
+  --white: #f5f6fa;
+  --sage: #6fcf97;
+  --sage-dim: #2d5040;
+  --amber: #f2c94c;
+  --amber-dim: #4a3a0f;
+  --rose: #eb5757;
+  --blue: #56ccf2;
+}
+
+html, body {
+  height: 100%;
+  background: var(--void);
+  color: var(--light);
+  font-family: 'Syne', sans-serif;
+  overflow: hidden;
+}
+
+/* BG GRID */
+.bg {
+  position: fixed;
+  inset: 0;
+  background:
+    linear-gradient(rgba(111,207,151,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(111,207,151,0.03) 1px, transparent 1px);
+  background-size: 48px 48px;
+  pointer-events: none;
+}
+
+.bg-glow {
+  position: fixed;
+  width: 600px; height: 600px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(111,207,151,0.07) 0%, transparent 70%);
+  top: -100px; left: -100px;
+  pointer-events: none;
+  animation: driftGlow 12s ease-in-out infinite alternate;
+}
+
+.bg-glow2 {
+  position: fixed;
+  width: 400px; height: 400px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(86,204,242,0.05) 0%, transparent 70%);
+  bottom: -80px; right: -80px;
+  pointer-events: none;
+  animation: driftGlow2 15s ease-in-out infinite alternate;
+}
+
+@keyframes driftGlow { to { transform: translate(60px, 80px); } }
+@keyframes driftGlow2 { to { transform: translate(-40px, -60px); } }
+
+/* LAYOUT */
+.shell {
+  display: flex;
+  height: 100vh;
+  position: relative;
+  z-index: 1;
+}
+
+/* LEFT PANEL */
+.left-panel {
+  width: 420px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 3rem;
+  background: linear-gradient(160deg, var(--deep) 0%, var(--void) 100%);
+  border-right: 1px solid var(--rim);
+  position: relative;
+  overflow: hidden;
+}
+
+.left-panel::before {
+  content: '';
+  position: absolute;
+  top: 0; right: 0;
+  width: 1px; height: 100%;
+  background: linear-gradient(to bottom, transparent, var(--sage), transparent);
+  opacity: 0.4;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.brand-mark {
+  width: 36px; height: 36px;
+  border: 1.5px solid var(--sage);
+  border-radius: 8px;
+  display: grid; place-items: center;
+  font-size: 1rem;
+}
+
+.brand-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.2rem;
+  font-style: italic;
+  color: var(--white);
+  letter-spacing: 0.02em;
+}
+
+.left-center {
+  padding: 2rem 0;
+}
+
+.left-tagline {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 3rem;
+  font-weight: 300;
+  line-height: 1.15;
+  color: var(--white);
+  margin-bottom: 1.5rem;
+}
+
+.left-tagline em {
+  font-style: italic;
+  color: var(--sage);
+}
+
+.left-sub {
+  font-size: 0.82rem;
+  color: var(--fog);
+  line-height: 1.8;
+  max-width: 280px;
+}
+
+.feature-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 2.5rem;
+}
+
+.feature-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.feature-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--sage);
+  flex-shrink: 0;
+}
+
+.feature-text {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  color: var(--cloud);
+}
+
+.left-footer {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.62rem;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+}
+
+/* RIGHT PANEL */
+.right-panel {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  overflow-y: auto;
+}
+
+/* SCREEN SYSTEM */
+.screen {
+  display: none;
+  width: 100%;
+  max-width: 420px;
+  animation: screenIn 0.35s ease;
+}
+
+.screen.active { display: block; }
+
+@keyframes screenIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* FORM CARD */
+.form-card {
+  background: var(--panel);
+  border: 1px solid var(--rim);
+  border-radius: 1.5rem;
+  padding: 2.5rem;
+}
+
+.form-eyebrow {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.15em;
+  color: var(--sage);
+  text-transform: uppercase;
+  margin-bottom: 0.6rem;
+}
+
+.form-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2rem;
+  font-weight: 400;
+  color: var(--white);
+  margin-bottom: 0.4rem;
+}
+
+.form-sub {
+  font-size: 0.8rem;
+  color: var(--fog);
+  margin-bottom: 2rem;
+  line-height: 1.6;
+}
+
+/* FIELDS */
+.field {
+  margin-bottom: 1.1rem;
+}
+
+.field-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  color: var(--fog);
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 0.45rem;
+}
+
+.field-wrap {
+  position: relative;
+}
+
+.field-icon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.9rem;
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.field-input {
+  width: 100%;
+  padding: 0.85rem 1rem 0.85rem 2.75rem;
+  background: var(--deep);
+  border: 1px solid var(--muted);
+  border-radius: 0.7rem;
+  font-family: 'Syne', sans-serif;
+  font-size: 0.88rem;
+  color: var(--white);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.field-input:focus {
+  outline: none;
+  border-color: var(--sage);
+  box-shadow: 0 0 0 3px rgba(111,207,151,0.1);
+}
+
+.field-input::placeholder { color: var(--muted); }
+
+.field-input.error { border-color: var(--rose) !important; }
+
+.field-error {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.62rem;
+  color: var(--rose);
+  margin-top: 0.35rem;
+  display: none;
+}
+
+.field-error.show { display: block; }
+
+/* PASSWORD TOGGLE */
+.pwd-toggle {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--fog);
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-family: 'DM Mono', monospace;
+  letter-spacing: 0.05em;
+  transition: color 0.2s;
+}
+
+.pwd-toggle:hover { color: var(--sage); }
+
+/* PASSWORD STRENGTH */
+.pwd-strength {
+  display: flex;
+  gap: 0.3rem;
+  margin-top: 0.5rem;
+}
+
+.strength-bar {
+  height: 3px;
+  flex: 1;
+  border-radius: 2px;
+  background: var(--muted);
+  transition: background 0.3s;
+}
+
+.strength-bar.weak   { background: var(--rose); }
+.strength-bar.medium { background: var(--amber); }
+.strength-bar.strong { background: var(--sage); }
+
+.strength-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.6rem;
+  color: var(--fog);
+  margin-top: 0.3rem;
+}
+
+/* CHECKBOX */
+.check-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.custom-check {
+  width: 18px; height: 18px;
+  border: 1.5px solid var(--muted);
+  border-radius: 4px;
+  cursor: pointer;
+  flex-shrink: 0;
+  display: grid; place-items: center;
+  margin-top: 0.1rem;
+  transition: all 0.2s;
+}
+
+.custom-check.checked {
+  background: var(--sage);
+  border-color: var(--sage);
+}
+
+.custom-check.checked::after {
+  content: '✓';
+  font-size: 0.65rem;
+  color: var(--void);
+  font-weight: bold;
+}
+
+.check-text {
+  font-size: 0.78rem;
+  color: var(--fog);
+  line-height: 1.5;
+}
+
+.check-text a { color: var(--sage); text-decoration: none; cursor: pointer; }
+.check-text a:hover { text-decoration: underline; }
+
+/* DIVIDER */
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.divider-line { flex: 1; height: 1px; background: var(--rim); }
+.divider-text {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.62rem;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+}
+
+/* BUTTONS */
+.btn-primary {
+  width: 100%;
+  padding: 0.95rem;
+  background: var(--sage);
+  color: var(--void);
+  border: none;
+  border-radius: 0.7rem;
+  font-family: 'Syne', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primary:hover { background: #5ab87e; transform: translateY(-1px); box-shadow: 0 8px 24px rgba(111,207,151,0.25); }
+.btn-primary:active { transform: translateY(0); }
+
+.btn-primary.loading { pointer-events: none; }
+.btn-primary.loading::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+  animation: shimmer 1.2s infinite;
+}
+
+@keyframes shimmer { from { transform: translateX(-100%); } to { transform: translateX(100%); } }
+
+.btn-ghost {
+  width: 100%;
+  padding: 0.85rem;
+  background: transparent;
+  color: var(--cloud);
+  border: 1px solid var(--rim);
+  border-radius: 0.7rem;
+  font-family: 'Syne', sans-serif;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 0.75rem;
+}
+
+.btn-ghost:hover { border-color: var(--fog); color: var(--white); }
+
+.btn-link {
+  background: none; border: none;
+  color: var(--sage);
+  font-family: 'Syne', sans-serif;
+  font-size: 0.82rem;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+}
+
+/* SWITCH ROW */
+.switch-row {
+  text-align: center;
+  margin-top: 1.5rem;
+  font-size: 0.8rem;
+  color: var(--fog);
+}
+
+/* ALERT */
+.alert {
+  padding: 0.85rem 1rem;
+  border-radius: 0.6rem;
+  margin-bottom: 1.25rem;
+  font-size: 0.8rem;
+  display: none;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.alert.show { display: flex; }
+.alert.success { background: var(--sage-dim); border: 1px solid var(--sage); color: var(--sage); }
+.alert.error   { background: rgba(235,87,87,0.1); border: 1px solid var(--rose); color: var(--rose); }
+.alert.info    { background: rgba(86,204,242,0.08); border: 1px solid rgba(86,204,242,0.3); color: var(--blue); }
+
+/* VERIFY SCREEN SPECIFICS */
+.otp-row {
+  display: flex;
+  gap: 0.6rem;
+  margin-bottom: 1.5rem;
+}
+
+.otp-input {
+  flex: 1;
+  aspect-ratio: 1;
+  background: var(--deep);
+  border: 1px solid var(--muted);
+  border-radius: 0.7rem;
+  text-align: center;
+  font-family: 'DM Mono', monospace;
+  font-size: 1.4rem;
+  color: var(--white);
+  transition: border-color 0.2s, box-shadow 0.2s;
+  max-width: 52px;
+}
+
+.otp-input:focus {
+  outline: none;
+  border-color: var(--sage);
+  box-shadow: 0 0 0 3px rgba(111,207,151,0.1);
+}
+
+.otp-input.filled { border-color: var(--sage); color: var(--sage); }
+
+.verify-email-display {
+  background: var(--deep);
+  border: 1px solid var(--rim);
+  border-radius: 0.6rem;
+  padding: 0.75rem 1rem;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.78rem;
+  color: var(--cloud);
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 1.75rem;
+}
+
+.resend-row {
+  text-align: center;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.68rem;
+  color: var(--fog);
+  margin-top: 1rem;
+}
+
+.resend-btn {
+  color: var(--sage);
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.68rem;
+}
+
+.resend-btn:disabled { color: var(--muted); cursor: default; }
+
+/* FORGOT SCREEN */
+.back-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: none;
+  border: none;
+  color: var(--fog);
+  font-family: 'DM Mono', monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  margin-bottom: 2rem;
+  transition: color 0.2s;
+}
+
+.back-btn:hover { color: var(--sage); }
+
+/* SUCCESS STATE */
+.success-icon {
+  width: 72px; height: 72px;
+  background: var(--sage-dim);
+  border: 2px solid var(--sage);
+  border-radius: 50%;
+  display: grid; place-items: center;
+  font-size: 2rem;
+  margin: 0 auto 1.5rem;
+  animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes popIn {
+  from { transform: scale(0.5); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+
+.success-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.75rem;
+  text-align: center;
+  color: var(--white);
+  margin-bottom: 0.75rem;
+}
+
+.success-msg {
+  text-align: center;
+  font-size: 0.82rem;
+  color: var(--fog);
+  line-height: 1.7;
+  margin-bottom: 2rem;
+}
+
+/* STEP INDICATOR */
+.steps {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 2rem;
+}
+
+.step-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--muted);
+  transition: all 0.3s;
+}
+
+.step-dot.active { background: var(--sage); width: 24px; border-radius: 4px; }
+.step-dot.done   { background: var(--sage); }
+
+.step-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.62rem;
+  color: var(--fog);
+  letter-spacing: 0.08em;
+  margin-left: 0.5rem;
+}
+
+</style>
+</head>
+<body>
+
+<div class="bg"></div>
+<div class="bg-glow"></div>
+<div class="bg-glow2"></div>
+
+<div class="shell">
+
+  <!-- LEFT PANEL -->
+  <div class="left-panel">
+    <div class="brand">
+      <div class="brand-mark">✦</div>
+      <div class="brand-name">EduPortfolio</div>
+    </div>
+
+    <div class="left-center">
+      <div class="left-tagline">Your growth,<br><em>documented.</em></div>
+      <p class="left-sub">A professional learning portfolio for educators who take their craft seriously. Reflect, grow, and showcase your journey.</p>
+
+      <div class="feature-list">
+        <div class="feature-item"><div class="feature-dot"></div><div class="feature-text">SECURE ACCOUNT WITH EMAIL VERIFICATION</div></div>
+        <div class="feature-item"><div class="feature-dot"></div><div class="feature-text">PERSONAL LEARNING PORTFOLIO DASHBOARD</div></div>
+        <div class="feature-item"><div class="feature-dot"></div><div class="feature-text">PD LOG, GOALS & ARTIFACT SHOWCASE</div></div>
+        <div class="feature-item"><div class="feature-dot"></div><div class="feature-text">PRIVATE — ONLY YOU CAN SEE YOUR DATA</div></div>
+      </div>
+    </div>
+
+    <div class="left-footer">© 2026 EDUPORTFOLIO · ALL RIGHTS RESERVED</div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="right-panel">
+
+    <!-- ══════ LOGIN SCREEN ══════ -->
+    <div class="screen active" id="screen-login">
+      <div class="form-card">
+        <div class="form-eyebrow">Welcome back</div>
+        <div class="form-title">Sign in</div>
+        <div class="form-sub">Enter your credentials to access your portfolio.</div>
+
+        <div class="alert info show" id="login-demo-note">
+          <span>🔌</span> <span>Demo UI — connect to the backend to enable real auth.</span>
+        </div>
+
+        <div class="alert error" id="login-alert"></div>
+
+        <div class="field">
+          <label class="field-label">Email Address</label>
+          <div class="field-wrap">
+            <span class="field-icon">✉</span>
+            <input class="field-input" id="login-email" type="email" placeholder="you@school.edu" autocomplete="email" />
+          </div>
+          <div class="field-error" id="login-email-err">Please enter a valid email.</div>
+        </div>
+
+        <div class="field">
+          <label class="field-label">Password</label>
+          <div class="field-wrap">
+            <span class="field-icon">🔒</span>
+            <input class="field-input" id="login-pwd" type="password" placeholder="Your password" autocomplete="current-password" />
+            <button class="pwd-toggle" onclick="togglePwd('login-pwd', this)">SHOW</button>
+          </div>
+          <div class="field-error" id="login-pwd-err">Password is required.</div>
+        </div>
+
+        <div style="display:flex;justify-content:flex-end;margin-bottom:1.5rem">
+          <button class="btn-link" onclick="show('forgot')">Forgot password?</button>
+        </div>
+
+        <button class="btn-primary" id="login-btn" onclick="handleLogin()">Sign In →</button>
+        <button class="btn-ghost" onclick="show('signup')">Create an account</button>
+
+        <div class="switch-row">
+          New here? <button class="btn-link" onclick="show('signup')">Create account</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════ SIGNUP SCREEN ══════ -->
+    <div class="screen" id="screen-signup">
+      <div class="form-card">
+        <button class="back-btn" onclick="show('login')">← Back to sign in</button>
+
+        <div class="steps">
+          <div class="step-dot active" id="step1"></div>
+          <div class="step-dot" id="step2"></div>
+          <div class="step-dot" id="step3"></div>
+          <div class="step-label" id="step-label">ACCOUNT DETAILS</div>
+        </div>
+
+        <div class="form-eyebrow">Get started</div>
+        <div class="form-title">Create account</div>
+        <div class="form-sub">Set up your secure educator portfolio account.</div>
+
+        <div class="alert error" id="signup-alert"></div>
+
+        <div class="field">
+          <label class="field-label">Full Name</label>
+          <div class="field-wrap">
+            <span class="field-icon">👤</span>
+            <input class="field-input" id="signup-name" type="text" placeholder="Ms. Jordan Rivera" autocomplete="name" />
+          </div>
+          <div class="field-error" id="signup-name-err">Name is required.</div>
+        </div>
+
+        <div class="field">
+          <label class="field-label">Email Address</label>
+          <div class="field-wrap">
+            <span class="field-icon">✉</span>
+            <input class="field-input" id="signup-email" type="email" placeholder="you@school.edu" autocomplete="email" />
+          </div>
+          <div class="field-error" id="signup-email-err">Please enter a valid email.</div>
+        </div>
+
+        <div class="field">
+          <label class="field-label">Password</label>
+          <div class="field-wrap">
+            <span class="field-icon">🔒</span>
+            <input class="field-input" id="signup-pwd" type="password" placeholder="Min. 8 characters" oninput="checkStrength(this.value)" autocomplete="new-password" />
+            <button class="pwd-toggle" onclick="togglePwd('signup-pwd', this)">SHOW</button>
+          </div>
+          <div class="pwd-strength">
+            <div class="strength-bar" id="sb1"></div>
+            <div class="strength-bar" id="sb2"></div>
+            <div class="strength-bar" id="sb3"></div>
+            <div class="strength-bar" id="sb4"></div>
+          </div>
+          <div class="strength-label" id="strength-label">Enter a password</div>
+          <div class="field-error" id="signup-pwd-err">Password must be at least 8 characters.</div>
+        </div>
+
+        <div class="field">
+          <label class="field-label">Confirm Password</label>
+          <div class="field-wrap">
+            <span class="field-icon">🔒</span>
+            <input class="field-input" id="signup-pwd2" type="password" placeholder="Repeat password" autocomplete="new-password" />
+            <button class="pwd-toggle" onclick="togglePwd('signup-pwd2', this)">SHOW</button>
+          </div>
+          <div class="field-error" id="signup-pwd2-err">Passwords do not match.</div>
+        </div>
+
+        <div class="check-row">
+          <div class="custom-check" id="terms-check" onclick="toggleCheck(this)"></div>
+          <div class="check-text">I agree to the <a>Terms of Service</a> and <a>Privacy Policy</a></div>
+        </div>
+
+        <button class="btn-primary" id="signup-btn" onclick="handleSignup()">Create Account →</button>
+      </div>
+    </div>
+
+    <!-- ══════ VERIFY EMAIL SCREEN ══════ -->
+    <div class="screen" id="screen-verify">
+      <div class="form-card">
+        <div class="steps">
+          <div class="step-dot done"></div>
+          <div class="step-dot active" style="width:24px;border-radius:4px"></div>
+          <div class="step-dot"></div>
+          <div class="step-label">VERIFY EMAIL</div>
+        </div>
+
+        <div class="form-eyebrow">Almost there</div>
+        <div class="form-title">Check your inbox</div>
+        <div class="form-sub">We sent a 6-digit verification code to:</div>
+
+        <div class="verify-email-display">
+          <span>✉</span>
+          <span id="verify-email-shown">you@school.edu</span>
+        </div>
+
+        <div class="alert error" id="verify-alert"></div>
+
+        <div class="otp-row" id="otp-row">
+          <input class="otp-input" maxlength="1" oninput="otpMove(this,0)" onkeydown="otpBack(event,0)" />
+          <input class="otp-input" maxlength="1" oninput="otpMove(this,1)" onkeydown="otpBack(event,1)" />
+          <input class="otp-input" maxlength="1" oninput="otpMove(this,2)" onkeydown="otpBack(event,2)" />
+          <input class="otp-input" maxlength="1" oninput="otpMove(this,3)" onkeydown="otpBack(event,3)" />
+          <input class="otp-input" maxlength="1" oninput="otpMove(this,4)" onkeydown="otpBack(event,4)" />
+          <input class="otp-input" maxlength="1" oninput="otpMove(this,5)" onkeydown="otpBack(event,5)" />
+        </div>
+
+        <button class="btn-primary" id="verify-btn" onclick="handleVerify()">Verify Email →</button>
+
+        <div class="resend-row" style="margin-top:1.25rem">
+          Didn't receive it? &nbsp;
+          <button class="resend-btn" id="resend-btn" onclick="handleResend()">Resend code</button>
+          <span id="resend-timer"></span>
+        </div>
+
+        <div class="switch-row">
+          <button class="btn-link" onclick="show('signup')" style="font-size:0.78rem;color:var(--fog)">← Use a different email</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════ FORGOT PASSWORD SCREEN ══════ -->
+    <div class="screen" id="screen-forgot">
+      <div class="form-card">
+        <button class="back-btn" onclick="show('login')">← Back to sign in</button>
+
+        <div class="form-eyebrow">Recovery</div>
+        <div class="form-title">Reset password</div>
+        <div class="form-sub">Enter your email and we'll send a reset link.</div>
+
+        <div class="alert success" id="forgot-success"></div>
+        <div class="alert error" id="forgot-error"></div>
+
+        <div class="field">
+          <label class="field-label">Email Address</label>
+          <div class="field-wrap">
+            <span class="field-icon">✉</span>
+            <input class="field-input" id="forgot-email" type="email" placeholder="you@school.edu" />
+          </div>
+          <div class="field-error" id="forgot-email-err">Please enter a valid email.</div>
+        </div>
+
+        <button class="btn-primary" id="forgot-btn" onclick="handleForgot()">Send Reset Link →</button>
+        <button class="btn-ghost" onclick="show('login')">Back to sign in</button>
+      </div>
+    </div>
+
+    <!-- ══════ SUCCESS SCREEN ══════ -->
+    <div class="screen" id="screen-success">
+      <div class="form-card" style="text-align:center">
+        <div class="success-icon">✓</div>
+        <div class="success-title">You're all set!</div>
+        <div class="success-msg">
+          Your account has been verified and is ready to use.<br>
+          Welcome to your educator portfolio.
+        </div>
+        <button class="btn-primary" onclick="show('login')">Go to Dashboard →</button>
+      </div>
+    </div>
+
+  </div><!-- end right-panel -->
+</div>
+
+<script>
+// ── SCREEN ROUTER ──
+function show(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+}
+
+// ── PASSWORD TOGGLE ──
+function togglePwd(id, btn) {
+  const inp = document.getElementById(id);
+  const hidden = inp.type === 'password';
+  inp.type = hidden ? 'text' : 'password';
+  btn.textContent = hidden ? 'HIDE' : 'SHOW';
+}
+
+// ── PASSWORD STRENGTH ──
+function checkStrength(val) {
+  const bars = [document.getElementById('sb1'), document.getElementById('sb2'), document.getElementById('sb3'), document.getElementById('sb4')];
+  const label = document.getElementById('strength-label');
+  bars.forEach(b => { b.className = 'strength-bar'; });
+
+  let score = 0;
+  if (val.length >= 8) score++;
+  if (/[A-Z]/.test(val)) score++;
+  if (/[0-9]/.test(val)) score++;
+  if (/[^A-Za-z0-9]/.test(val)) score++;
+
+  const cls = score <= 1 ? 'weak' : score <= 2 ? 'medium' : 'strong';
+  const labels = ['', 'Weak', 'Weak', 'Good', 'Strong'];
+  const colors = { weak: '#eb5757', medium: '#f2c94c', strong: '#6fcf97' };
+
+  for (let i = 0; i < score; i++) bars[i].classList.add(cls);
+  label.textContent = val.length ? labels[score] : 'Enter a password';
+  label.style.color = val.length ? colors[cls] : 'var(--fog)';
+}
+
+// ── CUSTOM CHECKBOX ──
+function toggleCheck(el) { el.classList.toggle('checked'); }
+
+// ── VALIDATE EMAIL ──
+function validEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
+
+// ── LOGIN HANDLER ──
+function handleLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const pwd   = document.getElementById('login-pwd').value;
+  let ok = true;
+
+  clearErrors(['login-email', 'login-pwd'], ['login-email-err', 'login-pwd-err']);
+
+  if (!validEmail(email)) { showError('login-email', 'login-email-err'); ok = false; }
+  if (!pwd) { showError('login-pwd', 'login-pwd-err'); ok = false; }
+  if (!ok) return;
+
+  const btn = document.getElementById('login-btn');
+  btn.textContent = 'Signing in…';
+  btn.classList.add('loading');
+
+  // Simulate API call
+  setTimeout(() => {
+    btn.textContent = 'Sign In →';
+    btn.classList.remove('loading');
+    const alert = document.getElementById('login-alert');
+    alert.textContent = '⚠ Backend not connected. See backend code to set up real auth.';
+    alert.className = 'alert error show';
+  }, 1400);
+}
+
+// ── SIGNUP HANDLER ──
+function handleSignup() {
+  const name  = document.getElementById('signup-name').value.trim();
+  const email = document.getElementById('signup-email').value.trim();
+  const pwd   = document.getElementById('signup-pwd').value;
+  const pwd2  = document.getElementById('signup-pwd2').value;
+  const terms = document.getElementById('terms-check').classList.contains('checked');
+  let ok = true;
+
+  clearErrors(['signup-name','signup-email','signup-pwd','signup-pwd2'],
+              ['signup-name-err','signup-email-err','signup-pwd-err','signup-pwd2-err']);
+
+  if (!name) { showError('signup-name', 'signup-name-err'); ok = false; }
+  if (!validEmail(email)) { showError('signup-email', 'signup-email-err'); ok = false; }
+  if (pwd.length < 8) { showError('signup-pwd', 'signup-pwd-err'); ok = false; }
+  if (pwd !== pwd2) { showError('signup-pwd2', 'signup-pwd2-err'); ok = false; }
+
+  if (!terms) {
+    const a = document.getElementById('signup-alert');
+    a.textContent = '⚠ Please accept the Terms of Service.';
+    a.className = 'alert error show';
+    return;
+  }
+
+  if (!ok) return;
+
+  const btn = document.getElementById('signup-btn');
+  btn.textContent = 'Creating account…';
+  btn.classList.add('loading');
+
+  setTimeout(() => {
+    btn.textContent = 'Create Account →';
+    btn.classList.remove('loading');
+    document.getElementById('verify-email-shown').textContent = email;
+    show('verify');
+    startResendTimer();
+  }, 1200);
+}
+
+// ── OTP INPUTS ──
+function otpMove(inp, idx) {
+  inp.classList.toggle('filled', inp.value.length > 0);
+  const inputs = document.querySelectorAll('.otp-input');
+  if (inp.value && idx < 5) inputs[idx + 1].focus();
+  if (getOtp().length === 6) document.getElementById('verify-btn').style.background = 'var(--sage)';
+}
+
+function otpBack(e, idx) {
+  const inputs = document.querySelectorAll('.otp-input');
+  if (e.key === 'Backspace' && !inputs[idx].value && idx > 0) inputs[idx - 1].focus();
+}
+
+function getOtp() {
+  return Array.from(document.querySelectorAll('.otp-input')).map(i => i.value).join('');
+}
+
+// ── VERIFY HANDLER ──
+function handleVerify() {
+  const code = getOtp();
+  const alert = document.getElementById('verify-alert');
+
+  if (code.length < 6) {
+    alert.textContent = '⚠ Please enter all 6 digits.';
+    alert.className = 'alert error show';
+    return;
+  }
+
+  const btn = document.getElementById('verify-btn');
+  btn.textContent = 'Verifying…';
+  btn.classList.add('loading');
+
+  setTimeout(() => {
+    btn.textContent = 'Verify Email →';
+    btn.classList.remove('loading');
+    // In real app: validate against backend
+    // For demo, any 6-digit code transitions to success
+    show('success');
+  }, 1200);
+}
+
+// ── RESEND TIMER ──
+let timerInterval;
+function startResendTimer() {
+  const btn = document.getElementById('resend-btn');
+  const timer = document.getElementById('resend-timer');
+  let secs = 60;
+  btn.disabled = true;
+  timer.textContent = ` (${secs}s)`;
+  clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    secs--;
+    timer.textContent = secs > 0 ? ` (${secs}s)` : '';
+    if (secs <= 0) { btn.disabled = false; clearInterval(timerInterval); }
+  }, 1000);
+}
+
+function handleResend() {
+  startResendTimer();
+  // In real app: POST /api/auth/resend-verification
+}
+
+// ── FORGOT HANDLER ──
+function handleForgot() {
+  const email = document.getElementById('forgot-email').value.trim();
+  clearErrors(['forgot-email'], ['forgot-email-err']);
+  if (!validEmail(email)) { showError('forgot-email', 'forgot-email-err'); return; }
+
+  const btn = document.getElementById('forgot-btn');
+  btn.textContent = 'Sending…';
+  btn.classList.add('loading');
+
+  setTimeout(() => {
+    btn.textContent = 'Send Reset Link →';
+    btn.classList.remove('loading');
+    document.getElementById('forgot-success').textContent = `✓ Reset link sent to ${email}`;
+    document.getElementById('forgot-success').className = 'alert success show';
+    document.getElementById('forgot-error').className = 'alert error';
+  }, 1200);
+}
+
+// ── HELPERS ──
+function showError(inputId, errId) {
+  document.getElementById(inputId)?.classList.add('error');
+  document.getElementById(errId)?.classList.add('show');
+}
+
+function clearErrors(inputs, errs) {
+  inputs.forEach(id => document.getElementById(id)?.classList.remove('error'));
+  errs.forEach(id => document.getElementById(id)?.classList.remove('show'));
+  document.getElementById('signup-alert') && (document.getElementById('signup-alert').className = 'alert error');
+}
+</script>
+</body>
+</html>
