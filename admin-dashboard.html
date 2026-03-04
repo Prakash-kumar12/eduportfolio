@@ -1,0 +1,1405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EduPortfolio — Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+
+:root {
+  --bg:      #0b0c10;
+  --surface: #13151c;
+  --card:    #1a1d27;
+  --border:  #252836;
+  --muted:   #353a4f;
+  --fog:     #5c6380;
+  --cloud:   #9ba3c0;
+  --light:   #dde1f0;
+  --white:   #f0f2fa;
+  --red:     #ff4d4d;
+  --red-dim: #3a1515;
+  --amber:   #f5a623;
+  --amber-dim:#3a2a0a;
+  --green:   #4cdb8a;
+  --green-dim:#0f2e1e;
+  --blue:    #4d9fff;
+  --blue-dim:#0f1e3a;
+  --purple:  #a78bfa;
+}
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--light);
+  min-height: 100vh;
+  display: flex;
+}
+
+/* ── SIDEBAR ── */
+.sidebar {
+  width: 240px;
+  flex-shrink: 0;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  z-index: 50;
+}
+
+.sidebar-logo {
+  padding: 1.75rem 1.5rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.logo-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--red-dim);
+  border: 1px solid var(--red);
+  border-radius: 0.4rem;
+  padding: 0.3rem 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.logo-badge span {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  color: var(--red);
+}
+
+.logo-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.5rem;
+  letter-spacing: 0.05em;
+  color: var(--white);
+  line-height: 1;
+}
+
+.logo-sub {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.6rem;
+  color: var(--fog);
+  letter-spacing: 0.1em;
+  margin-top: 0.2rem;
+}
+
+.nav-section {
+  padding: 1.25rem 1rem 0.5rem;
+}
+
+.nav-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.58rem;
+  letter-spacing: 0.15em;
+  color: var(--fog);
+  padding: 0 0.5rem;
+  margin-bottom: 0.4rem;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.65rem 0.75rem;
+  border-radius: 0.6rem;
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: var(--cloud);
+  transition: all 0.15s;
+  margin-bottom: 0.15rem;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+}
+
+.nav-item:hover { background: var(--card); color: var(--white); }
+.nav-item.active { background: var(--card); color: var(--white); border-left: 2px solid var(--red); }
+
+.nav-icon { font-size: 1rem; width: 20px; text-align: center; }
+
+.nav-badge {
+  margin-left: auto;
+  background: var(--red);
+  color: white;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.6rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 2rem;
+}
+
+.sidebar-footer {
+  margin-top: auto;
+  padding: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.admin-profile {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.65rem;
+  border-radius: 0.6rem;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.admin-profile:hover { background: var(--card); }
+
+.admin-avatar {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--red), var(--purple));
+  display: grid; place-items: center;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+
+.admin-name {
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--white);
+}
+
+.admin-role {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.58rem;
+  color: var(--red);
+  letter-spacing: 0.08em;
+}
+
+/* ── MAIN ── */
+.main {
+  margin-left: 240px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* ── TOPBAR ── */
+.topbar {
+  height: 64px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2rem;
+  position: sticky;
+  top: 0;
+  z-index: 40;
+}
+
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.breadcrumb {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--fog);
+  letter-spacing: 0.08em;
+}
+
+.breadcrumb span { color: var(--light); }
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 0.6rem;
+  padding: 0.5rem 0.9rem;
+}
+
+.search-box input {
+  background: none;
+  border: none;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--light);
+  width: 200px;
+}
+
+.search-box input:focus { outline: none; }
+.search-box input::placeholder { color: var(--fog); }
+
+.topbar-btn {
+  padding: 0.5rem 1rem;
+  border-radius: 0.6rem;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--cloud);
+  font-family: 'DM Mono', monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.topbar-btn:hover { border-color: var(--fog); color: var(--white); }
+
+.topbar-btn.danger {
+  border-color: var(--red);
+  color: var(--red);
+  background: var(--red-dim);
+}
+
+/* ── CONTENT ── */
+.content {
+  padding: 2rem;
+  flex: 1;
+}
+
+/* ── STAT CARDS ── */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  padding: 1.25rem 1.5rem;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s;
+}
+
+.stat-card:hover { transform: translateY(-2px); }
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+}
+
+.stat-card.blue::before  { background: var(--blue); }
+.stat-card.green::before { background: var(--green); }
+.stat-card.amber::before { background: var(--amber); }
+.stat-card.red::before   { background: var(--red); }
+
+.stat-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  color: var(--fog);
+  text-transform: uppercase;
+  margin-bottom: 0.75rem;
+}
+
+.stat-value {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 2.5rem;
+  line-height: 1;
+  margin-bottom: 0.4rem;
+}
+
+.stat-card.blue  .stat-value { color: var(--blue); }
+.stat-card.green .stat-value { color: var(--green); }
+.stat-card.amber .stat-value { color: var(--amber); }
+.stat-card.red   .stat-value { color: var(--red); }
+
+.stat-delta {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.65rem;
+  color: var(--fog);
+}
+
+.stat-delta.up   { color: var(--green); }
+.stat-delta.down { color: var(--red); }
+
+/* ── TABLE SECTION ── */
+.section-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.section-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.1rem;
+  letter-spacing: 0.06em;
+  color: var(--white);
+}
+
+.section-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.filter-tabs {
+  display: flex;
+  gap: 0.25rem;
+  background: var(--surface);
+  padding: 0.25rem;
+  border-radius: 0.5rem;
+}
+
+.filter-tab {
+  padding: 0.35rem 0.85rem;
+  border-radius: 0.35rem;
+  border: none;
+  background: transparent;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.06em;
+  color: var(--fog);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.filter-tab.active { background: var(--card); color: var(--white); }
+.filter-tab:hover:not(.active) { color: var(--cloud); }
+
+/* TABLE */
+.table-wrap { overflow-x: auto; }
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+thead tr {
+  background: var(--surface);
+}
+
+th {
+  padding: 0.75rem 1.25rem;
+  text-align: left;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  color: var(--fog);
+  text-transform: uppercase;
+  font-weight: 400;
+  white-space: nowrap;
+}
+
+td {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.85rem;
+  color: var(--light);
+  vertical-align: middle;
+}
+
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: rgba(255,255,255,0.02); }
+
+.user-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.user-av {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  display: grid; place-items: center;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+  font-weight: 600;
+  font-family: 'DM Mono', monospace;
+}
+
+.user-name { font-weight: 500; color: var(--white); font-size: 0.88rem; }
+.user-email { font-family: 'DM Mono', monospace; font-size: 0.68rem; color: var(--fog); margin-top: 0.1rem; }
+
+/* BADGES */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: 2rem;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+
+.badge-green  { background: var(--green-dim);  color: var(--green); border: 1px solid rgba(76,219,138,0.2); }
+.badge-amber  { background: var(--amber-dim);  color: var(--amber); border: 1px solid rgba(245,166,35,0.2); }
+.badge-red    { background: var(--red-dim);    color: var(--red);   border: 1px solid rgba(255,77,77,0.2); }
+.badge-blue   { background: var(--blue-dim);   color: var(--blue);  border: 1px solid rgba(77,159,255,0.2); }
+.badge-purple { background: rgba(167,139,250,0.1); color: var(--purple); border: 1px solid rgba(167,139,250,0.2); }
+
+/* ACTION BUTTONS */
+.action-row {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.act-btn {
+  padding: 0.35rem 0.7rem;
+  border-radius: 0.4rem;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  font-family: 'DM Mono', monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: all 0.15s;
+  color: var(--cloud);
+}
+
+.act-btn:hover { border-color: var(--fog); color: var(--white); }
+.act-btn.edit:hover  { border-color: var(--blue); color: var(--blue); background: var(--blue-dim); }
+.act-btn.suspend:hover { border-color: var(--amber); color: var(--amber); background: var(--amber-dim); }
+.act-btn.delete:hover  { border-color: var(--red); color: var(--red); background: var(--red-dim); }
+.act-btn.restore:hover { border-color: var(--green); color: var(--green); background: var(--green-dim); }
+
+/* ── MODAL ── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(6px);
+  z-index: 200;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.modal-overlay.open { display: flex; }
+
+.modal {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 1.25rem;
+  width: 100%;
+  max-width: 520px;
+  animation: modalIn 0.25s ease;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+@keyframes modalIn {
+  from { opacity:0; transform: scale(0.95) translateY(10px); }
+  to   { opacity:1; transform: scale(1) translateY(0); }
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.modal-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.25rem;
+  letter-spacing: 0.06em;
+  color: var(--white);
+}
+
+.modal-close {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: none;
+  color: var(--fog);
+  cursor: pointer;
+  display: grid; place-items: center;
+  font-size: 1rem;
+  transition: all 0.15s;
+}
+
+.modal-close:hover { border-color: var(--fog); color: var(--white); }
+
+.modal-body { padding: 1.5rem; }
+
+.modal-field { margin-bottom: 1.1rem; }
+
+.modal-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  color: var(--fog);
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 0.4rem;
+}
+
+.modal-input, .modal-select {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: var(--surface);
+  border: 1px solid var(--muted);
+  border-radius: 0.6rem;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.88rem;
+  color: var(--white);
+  transition: border-color 0.2s;
+}
+
+.modal-input:focus, .modal-select:focus {
+  outline: none;
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(77,159,255,0.1);
+}
+
+.modal-select { cursor: pointer; appearance: none; }
+
+.modal-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+
+.modal-footer {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+.btn-save {
+  padding: 0.65rem 1.5rem;
+  background: var(--blue);
+  color: var(--bg);
+  border: none;
+  border-radius: 0.6rem;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.btn-save:hover { opacity: 0.85; }
+
+.btn-cancel {
+  padding: 0.65rem 1.25rem;
+  background: var(--surface);
+  color: var(--cloud);
+  border: 1px solid var(--border);
+  border-radius: 0.6rem;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.btn-cancel:hover { border-color: var(--fog); color: var(--white); }
+
+/* CONFIRM MODAL */
+.confirm-icon {
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  display: grid; place-items: center;
+  font-size: 1.5rem;
+  margin: 0 auto 1rem;
+}
+
+.confirm-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.4rem;
+  text-align: center;
+  color: var(--white);
+  margin-bottom: 0.5rem;
+  letter-spacing: 0.04em;
+}
+
+.confirm-msg {
+  text-align: center;
+  font-size: 0.83rem;
+  color: var(--fog);
+  line-height: 1.7;
+}
+
+/* TOAST */
+.toast-wrap {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.toast {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  padding: 0.85rem 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.83rem;
+  color: var(--light);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  animation: toastIn 0.3s ease;
+  min-width: 280px;
+}
+
+@keyframes toastIn {
+  from { opacity:0; transform: translateY(12px); }
+  to   { opacity:1; transform: translateY(0); }
+}
+
+.toast.success { border-left: 3px solid var(--green); }
+.toast.error   { border-left: 3px solid var(--red); }
+.toast.info    { border-left: 3px solid var(--blue); }
+
+/* ACTIVITY LOG */
+.activity-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.9rem;
+  padding: 0.85rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.15s;
+}
+
+.activity-item:last-child { border-bottom: none; }
+.activity-item:hover { background: rgba(255,255,255,0.02); }
+
+.activity-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 0.35rem;
+}
+
+.activity-text { font-size: 0.83rem; color: var(--cloud); line-height: 1.5; }
+.activity-text strong { color: var(--white); }
+.activity-time { font-family: 'DM Mono', monospace; font-size: 0.62rem; color: var(--fog); margin-top: 0.2rem; }
+
+/* SECTION PAGE VISIBILITY */
+.page { display: none; }
+.page.active { display: block; }
+
+/* EMPTY STATE */
+.empty-state {
+  text-align: center;
+  padding: 3rem 1.5rem;
+  color: var(--fog);
+}
+.empty-state .icon { font-size: 2.5rem; margin-bottom: 1rem; }
+.empty-state p { font-size: 0.85rem; }
+
+/* scrollbar */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--muted); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-badge"><span>⬡ ADMIN PANEL</span></div>
+    <div class="logo-title">EduPortfolio</div>
+    <div class="logo-sub">CONTROL CENTER</div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">OVERVIEW</div>
+    <button class="nav-item active" onclick="showPage('dashboard', this)">
+      <span class="nav-icon">▦</span> Dashboard
+    </button>
+    <button class="nav-item" onclick="showPage('users', this)">
+      <span class="nav-icon">◉</span> All Accounts
+      <span class="nav-badge" id="user-count-badge">12</span>
+    </button>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">MANAGEMENT</div>
+    <button class="nav-item" onclick="showPage('pending', this)">
+      <span class="nav-icon">◎</span> Pending Verify
+      <span class="nav-badge" style="background:var(--amber)" id="pending-badge">3</span>
+    </button>
+    <button class="nav-item" onclick="showPage('suspended', this)">
+      <span class="nav-icon">⊘</span> Suspended
+    </button>
+    <button class="nav-item" onclick="showPage('activity', this)">
+      <span class="nav-icon">◈</span> Activity Log
+    </button>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">SYSTEM</div>
+    <button class="nav-item" onclick="showPage('settings', this)">
+      <span class="nav-icon">⚙</span> Settings
+    </button>
+  </div>
+
+  <div class="sidebar-footer">
+    <div class="admin-profile">
+      <div class="admin-avatar">A</div>
+      <div>
+        <div class="admin-name">Admin</div>
+        <div class="admin-role">SUPER ADMIN</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="breadcrumb">EDUPORTFOLIO / <span id="breadcrumb-page">DASHBOARD</span></div>
+    </div>
+    <div class="topbar-right">
+      <div class="search-box">
+        <span style="color:var(--fog);font-size:0.8rem">⌕</span>
+        <input type="text" placeholder="Search accounts…" id="global-search" oninput="globalSearch(this.value)" />
+      </div>
+      <button class="topbar-btn" onclick="exportCSV()">↓ Export CSV</button>
+      <button class="topbar-btn danger" onclick="showPage('settings', document.querySelector('.nav-item:last-child'))">⚙ Settings</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- ══ DASHBOARD PAGE ══ -->
+    <div class="page active" id="page-dashboard">
+
+      <div class="stats-row">
+        <div class="stat-card blue">
+          <div class="stat-label">Total Accounts</div>
+          <div class="stat-value" id="stat-total">12</div>
+          <div class="stat-delta up">↑ 3 this week</div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-label">Verified Users</div>
+          <div class="stat-value" id="stat-verified">9</div>
+          <div class="stat-delta up">↑ 75% rate</div>
+        </div>
+        <div class="stat-card amber">
+          <div class="stat-label">Pending Verify</div>
+          <div class="stat-value" id="stat-pending">3</div>
+          <div class="stat-delta">awaiting OTP</div>
+        </div>
+        <div class="stat-card red">
+          <div class="stat-label">Suspended</div>
+          <div class="stat-value" id="stat-suspended">1</div>
+          <div class="stat-delta down">review needed</div>
+        </div>
+      </div>
+
+      <!-- Recent Signups -->
+      <div class="section-card">
+        <div class="section-header">
+          <div class="section-title">Recent Signups</div>
+          <button class="topbar-btn" onclick="showPage('users', document.querySelectorAll('.nav-item')[1])">View All →</button>
+        </div>
+        <div class="table-wrap">
+          <table id="recent-table">
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>School</th>
+                <th>Status</th>
+                <th>Joined</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="recent-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Activity -->
+      <div class="section-card">
+        <div class="section-header">
+          <div class="section-title">Recent Activity</div>
+        </div>
+        <div id="activity-feed-dashboard"></div>
+      </div>
+
+    </div>
+
+    <!-- ══ ALL USERS PAGE ══ -->
+    <div class="page" id="page-users">
+      <div class="section-card">
+        <div class="section-header">
+          <div class="section-title">All Accounts</div>
+          <div class="section-actions">
+            <div class="filter-tabs">
+              <button class="filter-tab active" onclick="filterUsers('all', this)">All</button>
+              <button class="filter-tab" onclick="filterUsers('verified', this)">Verified</button>
+              <button class="filter-tab" onclick="filterUsers('pending', this)">Pending</button>
+              <button class="filter-tab" onclick="filterUsers('suspended', this)">Suspended</button>
+            </div>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>Role</th>
+                <th>School</th>
+                <th>Subject</th>
+                <th>Status</th>
+                <th>Last Login</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="users-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ PENDING PAGE ══ -->
+    <div class="page" id="page-pending">
+      <div class="section-card">
+        <div class="section-header">
+          <div class="section-title">Pending Email Verification</div>
+          <button class="topbar-btn" onclick="resendAllOtp()">✉ Resend All OTPs</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>Signed Up</th>
+                <th>OTP Sent</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="pending-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ SUSPENDED PAGE ══ -->
+    <div class="page" id="page-suspended">
+      <div class="section-card">
+        <div class="section-header">
+          <div class="section-title">Suspended Accounts</div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>Suspended On</th>
+                <th>Reason</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="suspended-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ ACTIVITY PAGE ══ -->
+    <div class="page" id="page-activity">
+      <div class="section-card">
+        <div class="section-header">
+          <div class="section-title">Full Activity Log</div>
+          <button class="topbar-btn danger" onclick="clearLog()">✕ Clear Log</button>
+        </div>
+        <div id="activity-feed-full"></div>
+      </div>
+    </div>
+
+    <!-- ══ SETTINGS PAGE ══ -->
+    <div class="page" id="page-settings">
+      <div class="section-card" style="max-width:600px">
+        <div class="section-header">
+          <div class="section-title">System Settings</div>
+        </div>
+        <div style="padding:1.5rem;display:flex;flex-direction:column;gap:1.25rem">
+
+          <div class="modal-field">
+            <label class="modal-label">Admin Email</label>
+            <input class="modal-input" type="email" value="admin@eduportfolio.com" />
+          </div>
+
+          <div class="modal-field">
+            <label class="modal-label">SMTP Host (for OTP emails)</label>
+            <input class="modal-input" type="text" placeholder="smtp.gmail.com" />
+          </div>
+
+          <div class="modal-row">
+            <div class="modal-field">
+              <label class="modal-label">SMTP User</label>
+              <input class="modal-input" type="email" placeholder="you@gmail.com" />
+            </div>
+            <div class="modal-field">
+              <label class="modal-label">SMTP App Password</label>
+              <input class="modal-input" type="password" placeholder="••••••••••••" />
+            </div>
+          </div>
+
+          <div class="modal-field">
+            <label class="modal-label">OTP Expiry (minutes)</label>
+            <input class="modal-input" type="number" value="60" />
+          </div>
+
+          <div class="modal-field">
+            <label class="modal-label">Auto-Suspend After Failed Logins</label>
+            <select class="modal-select">
+              <option>5 attempts</option>
+              <option>10 attempts</option>
+              <option>Disabled</option>
+            </select>
+          </div>
+
+          <button class="btn-save" style="align-self:flex-start;padding:0.75rem 2rem" onclick="toast('Settings saved successfully', 'success')">Save Settings</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end content -->
+</main>
+
+<!-- ══ EDIT USER MODAL ══ -->
+<div class="modal-overlay" id="edit-modal" onclick="closeModalOut(event,'edit-modal')">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Edit Account</div>
+      <button class="modal-close" onclick="closeModal('edit-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="edit-id" />
+      <div class="modal-row">
+        <div class="modal-field">
+          <label class="modal-label">Full Name</label>
+          <input class="modal-input" id="edit-name" type="text" />
+        </div>
+        <div class="modal-field">
+          <label class="modal-label">Email</label>
+          <input class="modal-input" id="edit-email" type="email" />
+        </div>
+      </div>
+      <div class="modal-row">
+        <div class="modal-field">
+          <label class="modal-label">School</label>
+          <input class="modal-input" id="edit-school" type="text" />
+        </div>
+        <div class="modal-field">
+          <label class="modal-label">Subject</label>
+          <input class="modal-input" id="edit-subject" type="text" />
+        </div>
+      </div>
+      <div class="modal-row">
+        <div class="modal-field">
+          <label class="modal-label">Role</label>
+          <select class="modal-select" id="edit-role">
+            <option value="EDUCATOR">Educator</option>
+            <option value="ADMIN">Admin</option>
+          </select>
+        </div>
+        <div class="modal-field">
+          <label class="modal-label">Status</label>
+          <select class="modal-select" id="edit-status">
+            <option value="verified">Verified</option>
+            <option value="pending">Pending</option>
+            <option value="suspended">Suspended</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-field">
+        <label class="modal-label">Reset Password (leave blank to keep current)</label>
+        <input class="modal-input" id="edit-pwd" type="password" placeholder="New password…" />
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal('edit-modal')">Cancel</button>
+      <button class="btn-save" onclick="saveEdit()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ CONFIRM MODAL ══ -->
+<div class="modal-overlay" id="confirm-modal" onclick="closeModalOut(event,'confirm-modal')">
+  <div class="modal" style="max-width:400px">
+    <div class="modal-body" style="padding:2rem 1.5rem">
+      <div class="confirm-icon" id="confirm-icon"></div>
+      <div class="confirm-title" id="confirm-title">Are you sure?</div>
+      <div class="confirm-msg" id="confirm-msg"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal('confirm-modal')">Cancel</button>
+      <button class="btn-save" id="confirm-ok" style="background:var(--red)">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast-wrap" id="toast-wrap"></div>
+
+<script>
+// ── DATA ──────────────────────────────────────
+let users = [
+  { id:1, name:'Priya Sharma',    email:'priya@greenwood.edu',  school:'Greenwood Academy',  subject:'Mathematics',  role:'EDUCATOR', status:'verified',  joined:'2026-01-10', lastLogin:'2026-03-03' },
+  { id:2, name:'Rohan Mehta',     email:'rohan@stpauls.edu',    school:"St. Paul's School",  subject:'History',      role:'EDUCATOR', status:'verified',  joined:'2026-01-15', lastLogin:'2026-03-01' },
+  { id:3, name:'Anjali Singh',    email:'anjali@davcollege.in', school:'DAV College',        subject:'English',      role:'EDUCATOR', status:'pending',   joined:'2026-02-20', lastLogin:'—' },
+  { id:4, name:'Vikram Nair',     email:'vikram@kendriya.edu',  school:'Kendriya Vidyalaya', subject:'Physics',      role:'EDUCATOR', status:'verified',  joined:'2026-01-28', lastLogin:'2026-02-28' },
+  { id:5, name:'Sneha Patel',     email:'sneha@rvs.edu',        school:'RVS School',         subject:'Biology',      role:'EDUCATOR', status:'suspended', joined:'2026-02-01', lastLogin:'2026-02-14' },
+  { id:6, name:'Arjun Kapoor',    email:'arjun@modernschool.in',school:'Modern School',      subject:'Chemistry',    role:'EDUCATOR', status:'verified',  joined:'2026-02-05', lastLogin:'2026-03-02' },
+  { id:7, name:'Deepa Iyer',      email:'deepa@loreto.edu',     school:'Loreto Convent',     subject:'Geography',    role:'EDUCATOR', status:'pending',   joined:'2026-02-25', lastLogin:'—' },
+  { id:8, name:'Karan Joshi',     email:'karan@bvb.edu',        school:'BVB School',         subject:'Computers',    role:'EDUCATOR', status:'verified',  joined:'2026-02-10', lastLogin:'2026-03-03' },
+  { id:9, name:'Meena Reddy',     email:'meena@kv2.edu',        school:'KV No. 2',           subject:'Social Sci.',  role:'EDUCATOR', status:'verified',  joined:'2026-01-20', lastLogin:'2026-02-27' },
+  {id:10, name:'Suresh Kumar',    email:'suresh@dps.edu',       school:'Delhi Public School',subject:'Economics',    role:'EDUCATOR', status:'verified',  joined:'2026-02-12', lastLogin:'2026-03-01' },
+  {id:11, name:'Lakshmi Menon',   email:'lakshmi@aids.edu',     school:'AIDS College',       subject:'Hindi',        role:'EDUCATOR', status:'pending',   joined:'2026-03-01', lastLogin:'—' },
+  {id:12, name:'Admin User',      email:'admin@eduportfolio.com',school:'—',                 subject:'—',            role:'ADMIN',    status:'verified',  joined:'2026-01-01', lastLogin:'2026-03-04' },
+];
+
+let activityLog = [
+  { type:'signup',    text:'<strong>Lakshmi Menon</strong> created an account', time:'2 hours ago',  color:'var(--blue)' },
+  { type:'verify',    text:'<strong>Karan Joshi</strong> verified their email',  time:'5 hours ago',  color:'var(--green)' },
+  { type:'suspend',   text:'Admin suspended <strong>Sneha Patel</strong>',       time:'1 day ago',    color:'var(--red)' },
+  { type:'edit',      text:'Admin edited <strong>Vikram Nair</strong>\'s account',time:'1 day ago',   color:'var(--amber)' },
+  { type:'signup',    text:'<strong>Deepa Iyer</strong> created an account',     time:'1 day ago',    color:'var(--blue)' },
+  { type:'login',     text:'<strong>Priya Sharma</strong> logged in',            time:'2 days ago',   color:'var(--purple)' },
+  { type:'verify',    text:'<strong>Arjun Kapoor</strong> verified their email', time:'3 days ago',   color:'var(--green)' },
+  { type:'signup',    text:'<strong>Karan Joshi</strong> created an account',    time:'3 days ago',   color:'var(--blue)' },
+];
+
+let confirmCallback = null;
+let currentFilter = 'all';
+
+// ── INIT ──────────────────────────────────────
+window.onload = () => {
+  renderAll();
+};
+
+function renderAll() {
+  renderRecentTable();
+  renderUsersTable(users);
+  renderPendingTable();
+  renderSuspendedTable();
+  renderActivityFeed('activity-feed-dashboard', 5);
+  renderActivityFeed('activity-feed-full', activityLog.length);
+  updateStats();
+}
+
+// ── PAGE ROUTING ─────────────────────────────
+function showPage(name, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  if (btn) btn.classList.add('active');
+  document.getElementById('breadcrumb-page').textContent = name.toUpperCase();
+}
+
+// ── STATS ────────────────────────────────────
+function updateStats() {
+  const total     = users.length;
+  const verified  = users.filter(u => u.status === 'verified').length;
+  const pending   = users.filter(u => u.status === 'pending').length;
+  const suspended = users.filter(u => u.status === 'suspended').length;
+
+  document.getElementById('stat-total').textContent     = total;
+  document.getElementById('stat-verified').textContent  = verified;
+  document.getElementById('stat-pending').textContent   = pending;
+  document.getElementById('stat-suspended').textContent = suspended;
+  document.getElementById('user-count-badge').textContent = total;
+  document.getElementById('pending-badge').textContent  = pending;
+}
+
+// ── AVATAR COLOR ─────────────────────────────
+const colors = ['#4d9fff','#4cdb8a','#f5a623','#a78bfa','#ff6b9d','#56ccf2'];
+function avatarColor(id) { return colors[id % colors.length]; }
+function initials(name) { return name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase(); }
+
+function statusBadge(status) {
+  const map = {
+    verified:  ['badge-green',  '● VERIFIED'],
+    pending:   ['badge-amber',  '◌ PENDING'],
+    suspended: ['badge-red',    '⊘ SUSPENDED'],
+  };
+  const [cls, label] = map[status] || ['badge-blue', status];
+  return `<span class="badge ${cls}">${label}</span>`;
+}
+
+// ── RENDER RECENT TABLE ───────────────────────
+function renderRecentTable() {
+  const recent = [...users].sort((a,b)=>b.id-a.id).slice(0,5);
+  document.getElementById('recent-tbody').innerHTML = recent.map(u => `
+    <tr>
+      <td><div class="user-cell">
+        <div class="user-av" style="background:${avatarColor(u.id)};color:#0b0c10">${initials(u.name)}</div>
+        <div><div class="user-name">${u.name}</div><div class="user-email">${u.email}</div></div>
+      </div></td>
+      <td style="color:var(--cloud);font-size:0.83rem">${u.school}</td>
+      <td>${statusBadge(u.status)}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:0.72rem;color:var(--fog)">${u.joined}</td>
+      <td><div class="action-row">
+        <button class="act-btn edit" onclick="openEdit(${u.id})">✏ Edit</button>
+        ${u.status !== 'suspended'
+          ? `<button class="act-btn suspend" onclick="confirmSuspend(${u.id})">⊘ Suspend</button>`
+          : `<button class="act-btn restore" onclick="restoreUser(${u.id})">↺ Restore</button>`}
+      </div></td>
+    </tr>`).join('');
+}
+
+// ── RENDER USERS TABLE ────────────────────────
+function renderUsersTable(data) {
+  document.getElementById('users-tbody').innerHTML = data.length ? data.map(u => `
+    <tr>
+      <td><div class="user-cell">
+        <div class="user-av" style="background:${avatarColor(u.id)};color:#0b0c10">${initials(u.name)}</div>
+        <div><div class="user-name">${u.name}</div><div class="user-email">${u.email}</div></div>
+      </div></td>
+      <td>${u.role === 'ADMIN' ? '<span class="badge badge-purple">ADMIN</span>' : '<span class="badge" style="background:var(--surface);color:var(--cloud);border:1px solid var(--border)">EDUCATOR</span>'}</td>
+      <td style="color:var(--cloud);font-size:0.83rem">${u.school}</td>
+      <td style="color:var(--cloud);font-size:0.83rem">${u.subject}</td>
+      <td>${statusBadge(u.status)}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:0.68rem;color:var(--fog)">${u.lastLogin}</td>
+      <td><div class="action-row">
+        <button class="act-btn edit" onclick="openEdit(${u.id})">✏ Edit</button>
+        ${u.status !== 'suspended'
+          ? `<button class="act-btn suspend" onclick="confirmSuspend(${u.id})">⊘ Suspend</button>`
+          : `<button class="act-btn restore" onclick="restoreUser(${u.id})">↺ Restore</button>`}
+        <button class="act-btn delete" onclick="confirmDelete(${u.id})">✕ Delete</button>
+      </div></td>
+    </tr>`).join('') : `<tr><td colspan="7"><div class="empty-state"><div class="icon">◎</div><p>No accounts found.</p></div></td></tr>`;
+}
+
+// ── RENDER PENDING ────────────────────────────
+function renderPendingTable() {
+  const pending = users.filter(u => u.status === 'pending');
+  document.getElementById('pending-tbody').innerHTML = pending.length ? pending.map(u => `
+    <tr>
+      <td><div class="user-cell">
+        <div class="user-av" style="background:${avatarColor(u.id)};color:#0b0c10">${initials(u.name)}</div>
+        <div><div class="user-name">${u.name}</div><div class="user-email">${u.email}</div></div>
+      </div></td>
+      <td style="font-family:'DM Mono',monospace;font-size:0.72rem;color:var(--fog)">${u.joined}</td>
+      <td><span class="badge badge-amber">⏱ PENDING</span></td>
+      <td><div class="action-row">
+        <button class="act-btn edit" onclick="resendOtp(${u.id})">✉ Resend OTP</button>
+        <button class="act-btn restore" onclick="manualVerify(${u.id})">✓ Verify Now</button>
+        <button class="act-btn delete" onclick="confirmDelete(${u.id})">✕ Delete</button>
+      </div></td>
+    </tr>`).join('') : `<tr><td colspan="4"><div class="empty-state"><div class="icon">✓</div><p>No pending verifications.</p></div></td></tr>`;
+}
+
+// ── RENDER SUSPENDED ──────────────────────────
+function renderSuspendedTable() {
+  const suspended = users.filter(u => u.status === 'suspended');
+  document.getElementById('suspended-tbody').innerHTML = suspended.length ? suspended.map(u => `
+    <tr>
+      <td><div class="user-cell">
+        <div class="user-av" style="background:var(--muted);color:var(--fog)">${initials(u.name)}</div>
+        <div><div class="user-name">${u.name}</div><div class="user-email">${u.email}</div></div>
+      </div></td>
+      <td style="font-family:'DM Mono',monospace;font-size:0.72rem;color:var(--fog)">${u.lastLogin}</td>
+      <td><span class="badge badge-red">Policy violation</span></td>
+      <td><div class="action-row">
+        <button class="act-btn restore" onclick="restoreUser(${u.id})">↺ Restore</button>
+        <button class="act-btn edit" onclick="openEdit(${u.id})">✏ Edit</button>
+        <button class="act-btn delete" onclick="confirmDelete(${u.id})">✕ Delete</button>
+      </div></td>
+    </tr>`).join('') : `<tr><td colspan="4"><div class="empty-state"><div class="icon">⊘</div><p>No suspended accounts.</p></div></td></tr>`;
+}
+
+// ── ACTIVITY FEED ─────────────────────────────
+function renderActivityFeed(containerId, limit) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  el.innerHTML = activityLog.slice(0, limit).map(a => `
+    <div class="activity-item">
+      <div class="activity-dot" style="background:${a.color}"></div>
+      <div>
+        <div class="activity-text">${a.text}</div>
+        <div class="activity-time">${a.time}</div>
+      </div>
+    </div>`).join('');
+}
+
+function addActivity(text, color) {
+  activityLog.unshift({ text, time: 'just now', color: color || 'var(--blue)' });
+  renderActivityFeed('activity-feed-dashboard', 5);
+  renderActivityFeed('activity-feed-full', activityLog.length);
+}
+
+// ── FILTER ───────────────────────────────────
+function filterUsers(status, btn) {
+  document.querySelectorAll('.filter-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentFilter = status;
+  const filtered = status === 'all' ? users : users.filter(u => u.status === status);
+  renderUsersTable(filtered);
+}
+
+// ── GLOBAL SEARCH ────────────────────────────
+function globalSearch(q) {
+  if (!q) { renderUsersTable(users); return; }
+  const lq = q.toLowerCase();
+  const filtered = users.filter(u =>
+    u.name.toLowerCase().includes(lq) ||
+    u.email.toLowerCase().includes(lq) ||
+    u.school.toLowerCase().includes(lq)
+  );
+  renderUsersTable(filtered);
+  showPage('users', document.querySelectorAll('.nav-item')[1]);
+}
+
+// ── EDIT USER ────────────────────────────────
+function openEdit(id) {
+  const u = users.find(x => x.id === id);
+  if (!u) return;
+  document.getElementById('edit-id').value    = id;
+  document.getElementById('edit-name').value  = u.name;
+  document.getElementById('edit-email').value = u.email;
+  document.getElementById('edit-school').value= u.school;
+  document.getElementById('edit-subject').value=u.subject;
+  document.getElementById('edit-role').value  = u.role;
+  document.getElementById('edit-status').value= u.status;
+  document.getElementById('edit-pwd').value   = '';
+  document.getElementById('edit-modal').classList.add('open');
+}
+
+function saveEdit() {
+  const id = parseInt(document.getElementById('edit-id').value);
+  const u  = users.find(x => x.id === id);
+  if (!u) return;
+
+  u.name    = document.getElementById('edit-name').value;
+  u.email   = document.getElementById('edit-email').value;
+  u.school  = document.getElementById('edit-school').value;
+  u.subject = document.getElementById('edit-subject').value;
+  u.role    = document.getElementById('edit-role').value;
+  u.status  = document.getElementById('edit-status').value;
+
+  closeModal('edit-modal');
+  renderAll();
+  addActivity(`Admin edited <strong>${u.name}</strong>'s account`, 'var(--amber)');
+  toast(`${u.name}'s account updated`, 'success');
+}
+
+// ── SUSPEND / RESTORE ─────────────────────────
+function confirmSuspend(id) {
+  const u = users.find(x => x.id === id);
+  document.getElementById('confirm-icon').textContent = '⊘';
+  document.getElementById('confirm-icon').style.cssText = 'background:var(--amber-dim);border:2px solid var(--amber)';
+  document.getElementById('confirm-title').textContent = 'Suspend Account?';
+  document.getElementById('confirm-msg').innerHTML = `This will prevent <strong>${u.name}</strong> from logging in. You can restore them later.`;
+  document.getElementById('confirm-ok').style.background = 'var(--amber)';
+  confirmCallback = () => { u.status = 'suspended'; renderAll(); addActivity(`Admin suspended <strong>${u.name}</strong>`, 'var(--red)'); toast(`${u.name} suspended`, 'info'); };
+  document.getElementById('confirm-modal').classList.add('open');
+  document.getElementById('confirm-ok').onclick = () => { confirmCallback(); closeModal('confirm-modal'); };
+}
+
+function restoreUser(id) {
+  const u = users.find(x => x.id === id);
+  u.status = 'verified';
+  renderAll();
+  addActivity(`Admin restored <strong>${u.name}</strong>`, 'var(--green)');
+  toast(`${u.name} restored`, 'success');
+}
+
+// ── DELETE ────────────────────────────────────
+function confirmDelete(id) {
+  const u = users.find(x => x.id === id);
+  document.getElementById('confirm-icon').textContent = '✕';
+  document.getElementById('confirm-icon').style.cssText = 'background:var(--red-dim);border:2px solid var(--red)';
+  document.getElementById('confirm-title').textContent = 'Delete Account?';
+  document.getElementById('confirm-msg').innerHTML = `This will permanently delete <strong>${u.name}</strong>'s account and all their portfolio data. This cannot be undone.`;
+  document.getElementById('confirm-ok').style.background = 'var(--red)';
+  document.getElementById('confirm-ok').onclick = () => {
+    users = users.filter(x => x.id !== id);
+    renderAll();
+    addActivity(`Admin deleted account: <strong>${u.email}</strong>`, 'var(--red)');
+    toast(`${u.name}'s account deleted`, 'error');
+    closeModal('confirm-modal');
+  };
+  document.getElementById('confirm-modal').classList.add('open');
+}
+
+// ── OTP ACTIONS ───────────────────────────────
+function resendOtp(id) {
+  const u = users.find(x => x.id === id);
+  addActivity(`OTP resent to <strong>${u.email}</strong>`, 'var(--blue)');
+  toast(`OTP resent to ${u.email}`, 'info');
+}
+
+function resendAllOtp() {
+  const pending = users.filter(u => u.status === 'pending');
+  pending.forEach(u => addActivity(`OTP resent to <strong>${u.email}</strong>`, 'var(--blue)'));
+  toast(`OTPs resent to ${pending.length} users`, 'info');
+}
+
+function manualVerify(id) {
+  const u = users.find(x => x.id === id);
+  u.status = 'verified';
+  renderAll();
+  addActivity(`Admin manually verified <strong>${u.name}</strong>`, 'var(--green)');
+  toast(`${u.name} manually verified`, 'success');
+}
+
+// ── EXPORT CSV ────────────────────────────────
+function exportCSV() {
+  const header = 'ID,Name,Email,School,Subject,Role,Status,Joined,Last Login';
+  const rows = users.map(u => `${u.id},"${u.name}","${u.email}","${u.school}","${u.subject}",${u.role},${u.status},${u.joined},${u.lastLogin}`);
+  const csv  = [header, ...rows].join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const a    = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'eduportfolio-accounts.csv';
+  a.click();
+  toast('CSV exported', 'success');
+}
+
+function clearLog() {
+  activityLog = [];
+  renderActivityFeed('activity-feed-dashboard', 5);
+  renderActivityFeed('activity-feed-full', 0);
+  toast('Activity log cleared', 'info');
+}
+
+// ── MODAL HELPERS ─────────────────────────────
+function closeModal(id)          { document.getElementById(id).classList.remove('open'); }
+function closeModalOut(e, id)    { if (e.target === document.getElementById(id)) closeModal(id); }
+
+// ── TOAST ─────────────────────────────────────
+function toast(msg, type = 'info') {
+  const icons = { success:'✓', error:'✕', info:'ℹ' };
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.innerHTML = `<span>${icons[type]}</span><span>${msg}</span>`;
+  document.getElementById('toast-wrap').appendChild(el);
+  setTimeout(() => el.remove(), 3500);
+}
+</script>
+</body>
+</html>
